@@ -1,0 +1,61 @@
+\documentclass[12pt]{article}
+\usepackage{}
+%%%%%%%%%%%%%%%%%%%%%%%%
+% PREAMBLE
+\usepackage{times}
+\usepackage{setspace}
+\linespread{1.25}
+\usepackage[letterpaper, margin=1in]{geometry}
+\addtolength{\topmargin}{-0.5in}
+
+\begin{document}
+\title{Constructive Solid Geometry for Interactive Environments}
+\author{Nicholas Czaban}
+\date{\today}
+\maketitle
+
+\section{Constructive Solid Geometry}
+\subsection{General Concepts}
+Constructive Solid Geometry (CSG) is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include unions, intersections, and differences; the types of shapes vary from one implementation to another, but generally include spheres, rectangular prisms, and cylinders.
+\subsubsection{Real-Time Rendering and Image-Based CSG}
+One substantial category in CSG is the difference between Real-Time Rendering of CSG objects and Image-Based CSG objects. Real-time rendering poses a number of issues, particularly for shapes that are interactively modified during runtime. While real-time rendering can be accomplished by passing the shape as a mathematically calculated model, this solution is more applicable to static CSG shapes and does not work well for interactive modifications\cite{open_csg}. The alternative solution, image-based rendering algorithms, avoid most of the complex boundary calculations of constructive solid geometry by storing only an image of the shape in the frame buffer\cite{open_csg}. 
+\subsection{Use in Computer Graphics}
+\subsubsection{Interactive Modification}
+\subsubsection{Ray Tracing}
+\subsection{CSG Algorithms}
+\section{Software}
+\subsection{Display Program}
+\subsection{Asteroids}
+\subsubsection{CSG Usage}
+The shapes are individually created using OpenSCAD, a program for computer assisted design. The shapes are exported as .stl files, which can be read using the reader function located in stlReader.cpp.
+\subsubsection{OpenGL Implementation}
+\section{Conclusion}
+
+\newpage
+\begin{thebibliography}{10}
+\bibitem{cs_dictionary}
+  Andrew Butterfield and Gerard Ngondi,
+  \textit{A Dictionary of Computer Science},
+  Oxford University Press,
+  7th edition,
+  2016
+
+\bibitem{hardware_csg}
+  Kirsch, Florian and J\"{u}rgen D\"{o}llner. ``Rendering Techniques for Hardware-Accelerated Image-Based CSG.'' {\it Journal of WSCG}, vol. 12, no. 2, 2004, pp. 221-228.
+
+\bibitem{open_csg}
+  Kirsch, Florian and J\"{u}rgen D\"{o}llner. ``OpenCSG: A Library for Image-Based CSG Rendering.'' {\it Proceedings of the FREENIX/ Open Source Track, 2005 USENIX Annual Technical Conference}. 2005.
+
+\bibitem{advanced_opengl}
+  McReynolds, Tom and David Blythe. {\it Advanced Graphic Programming Using OpenGL}. Morgan Kaufmann, San Francisco, 2005.
+
+\bibitem{geoinformation}
+  Ooms, Kristien. ``A 3D inclusion test on large dataset.'' {\it Developments in 3D Geo-Information Sciences}. Edited by Philippe De Maeyer and Tijs Neutens. Springer, New York, 2010.
+
+\bibitem{raytrace}
+  Wilt, Nicholas. {\it Object-Oriented Ray Tracing in C++}. John Wiley \& Sons, New York, 1994, pp 207-227.
+
+\bibitem{interactive_csg}
+  Ulyanov, D., D. Bogolepov, and V. Turlapov. ``Interactive Visualization of Constructive Solid Geometry Scenes on Graphic Processors.'' {\it Programming and Computer Software}, vol. 43, no. 4, 2017, pp. 258-267.
+\end{thebibliography}
+\end{document}
