@@ -11,14 +11,15 @@
 \usepackage[letterpaper, margin=1in]{geometry}
 \addtolength{\topmargin}{-0.5in}
 
-\lstset{language=C++, upquote=true}
+\lstset{language=C++, upquote=true, breaklines=true}
 
 \lstdefinelanguage{scad}
 {
+  basicstyle={\small\ttfamily},
   morekeywords={true, false},
   sensitive=true,
-  commentstyle=\it,
   morecomment=[l][//],
+  commentstyle=\it,
   morestring=[b]''
   breaklines=true,
   showstringspaces=false,
@@ -32,31 +33,31 @@
 
 \section{Constructive Solid Geometry}
 \subsection{General Concepts}
-\indent Constructive Solid Geometry (CSG) is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include unions, intersections, and differences; the types of shapes vary from one implementation to another, but generally include spheres, cubes, and cylinders, as well as their standard transformations (rotations, scaling, translations)\cite{cs_dictionary}. This technique provides a simpler way to create three-dimensional shapes without the need to define each vertex
+Constructive Solid Geometry (CSG) is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include unions, intersections, and differences; the types of shapes vary from one implementation to another, but generally include spheres, cubes, and cylinders, as well as their standard transformations (rotations, scaling, translations)\cite{cs_dictionary}. This technique provides a simpler way to create three-dimensional shapes without the need to define each vertex
 \subsubsection{Real-Time Rendering and Image-Based CSG}
-\indent One substantial category in CSG is the difference between Real-Time Rendering of CSG objects and Image-Based CSG objects. Real-time rendering poses a number of issues, particularly for shapes that are interactively modified during runtime. While real-time rendering can be accomplished by passing the shape as a mathematically calculated model, this solution is more applicable to static CSG shapes and does not work well for interactive modifications\cite{open_csg}. The alternative solution, image-based rendering algorithms, avoid most of the complex boundary calculations of constructive solid geometry by storing only an image of the shape in the frame buffer\cite{open_csg}. 
+One substantial category in CSG is the difference between Real-Time Rendering of CSG objects and Image-Based CSG objects. Real-time rendering poses a number of issues, particularly for shapes that are interactively modified during runtime. While real-time rendering can be accomplished by passing the shape as a mathematically calculated model, this solution is more applicable to static CSG shapes and does not work well for interactive modifications\cite{open_csg}. The alternative solution, image-based rendering algorithms, avoid most of the complex boundary calculations of constructive solid geometry by storing only an image of the shape in the frame buffer\cite{open_csg}. 
 \subsection{Use in Computer Graphics}
 \subsubsection{Interactive Modification}
 \subsubsection{Ray Tracing}
 \subsection{CSG Algorithms}
-\indent Given the rendering complexity of constructive solid geometry, several techniques have been developed to improve the speed and quality of CSG primitives. In Nicholas Wilt's implementation of CSG in the Object Oriented Ray Tracing (OORT) class library, complicated calculations can be short-circuited by creating optimized CSG trees where simpler objects are the left children of each boolean operation. In OORT, ray tracing calculations between two objects on a CSG tree always test against the left object first. Thus, functions like \texttt{CSGIntersection} can avoid testing rays against more complex shapes if the left shape returns FALSE\cite{raytrace}.
+Given the rendering complexity of constructive solid geometry, several techniques have been developed to improve the speed and quality of CSG primitives. In Nicholas Wilt's implementation of CSG in the Object Oriented Ray Tracing (OORT) class library, complicated calculations can be short-circuited by creating optimized CSG trees where simpler objects are the left children of each boolean operation. In OORT, ray tracing calculations between two objects on a CSG tree always test against the left object first. Thus, functions like \texttt{CSGIntersection} can avoid testing rays against more complex shapes if the left shape returns FALSE\cite{raytrace}.
 \section{Software}
 \subsection{Display Program}
-
-\subsection{Asteroids}
-\indent 
 \subsubsection{CSG Usage}
-\indent The shapes are individually created using OpenSCAD, a program for computer assisted design. The shapes are exported as .stl files, which can be read using the reader function located in \texttt{stlReader.cpp}. The code within a standard .scad file will look similar to this:
+The shapes are individually created using OpenSCAD, a program for computer assisted design. The shapes are exported as .stl files, which can be read using the reader function located in \texttt{stlReader.cpp}. The code within a standard .scad file will look similar to this:
 \lstset{language=scad}
 \begin{lstlisting}
   // A 6-sided die with rounded corners and circular faces
   intersection() {
     cube(15, center=true);
-    sphere(r=10, \$fn=50);
+    rotate(90, [1,0,0]) sphere(r=10, \$fn=50);
   }
-  
 \end{lstlisting}
+The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Spheres\\
+
+\noindent
 \subsubsection{OpenGL Implementation}
+\subsection{Asteroids}
 \section{Conclusion}
 \newpage
 \section{Appendix}
