@@ -15,11 +15,11 @@
 
 \lstdefinelanguage{scad}
 {
+  morecomment=[l][//],
+  commentstyle={\it},
   basicstyle={\small\ttfamily},
   morekeywords={true, false},
   sensitive=true,
-  morecomment=[l][//],
-  commentstyle=\it,
   morestring=[b]''
   breaklines=true,
   showstringspaces=false,
@@ -47,15 +47,14 @@ Given the rendering complexity of constructive solid geometry, several technique
 The shapes are individually created using OpenSCAD, a program for computer assisted design. The shapes are exported as .stl files, which can be read using the reader function located in \texttt{stlReader.cpp}. The code within a standard .scad file will look similar to this:
 \lstset{language=scad}
 \begin{lstlisting}
-  // A 6-sided die with rounded corners and circular faces
   intersection() {
     cube(15, center=true);
     rotate(90, [1,0,0]) sphere(r=10, \$fn=50);
   }
 \end{lstlisting}
-The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Spheres\\
+The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Cylinders have independantly defined radii for both ends; a cone can be created by setting one radius to 0. As seen in the \texttt{rotate} call, vectors are contained within square brackets.For the sake of simplicity, and to better explore the possibilities of CSG, only rectangular prisms, cones, cylinders, and spheres were used to build each object. For transformations, only rotate and translate were used.\\
 
-\noindent
+\noindent In order to 
 \subsubsection{OpenGL Implementation}
 \subsection{Asteroids}
 \section{Conclusion}

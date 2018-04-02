@@ -1,6 +1,4 @@
 union(){
-//cube(5, center=true);
-
 // Diamond
 	union(){
 	difference(){

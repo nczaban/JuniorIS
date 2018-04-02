@@ -32,7 +32,7 @@ static GLfloat zpos = 0;
 static GLfloat speed = 0.2;
 
 GLfloat light_specular[] = {1, 1, 1, 1.0};
-GLfloat light_position[] = {0.0, -2.0, -10.0, 0.0};
+GLfloat light_position[] = {0.0, 3.0, -5.0, 0.0};
 
 std::vector<Facet> asteroids = readFile("pipes.stl");
 std::vector<Facet> spaceship = readFile("spaceship.stl");
@@ -51,12 +51,42 @@ void test_draw(){
   glEnd();
 }
 
+void flight(){
+  
+  // Change spaceship position
+  zpos += speed;
+  if(zpos <= 100){
+	zpos = 0;
+	speed += 0.01;
+  }
+  if(leftKey){
+	if(xpos > -10) xpos -= 0.2;
+	else xpos = -10;
+  }
+  if(rightKey){
+	if(xpos < 10) xpos += 0.2;
+	else xpos = 10;
+  }
+  if(upKey){
+	if(ypos < 10) ypos += 0.2;
+	else ypos = 10;	
+  }
+  if(downKey){
+	if(ypos > -10) ypos -= 0.2;
+	else ypos = -10;
+  }
+  glutPostRedisplay();
+}
+
+
 void setup_scene(){
   // Draw the spaceship
-  glPushMatrix();
-  glRotatef(-1*angle2, 1.0, 0.0, 0.0);
-  glRotatef(-1*angle, 0.0, 1.0, 0.0);
 
+  gluLookAt(0,-1,5,
+			0,0,0,
+			0,1,0);
+
+  glPushMatrix();
   glColor3f(0.4, 0.4, 0.4);
   glTranslatef(xpos, ypos, 1);
   if(leftKey) glRotatef(15, 0, 0, 1);
@@ -71,26 +101,12 @@ void setup_scene(){
   
   glBegin(GL_TRIANGLES);
   for(int i = 0; i<spaceship.size(); i++){
-	glNormal3f(spaceship[i].normal[0], -1*spaceship[i].normal[1], spaceship[i].normal[2]);
+	glNormal3f(spaceship[i].normal[0], spaceship[i].normal[1], spaceship[i].normal[2]);
 	if((spaceship[i].normal[2] == -1) && (spaceship[i].vertices[0][2] < -1.5)) glColor3f(.4, .6, 1);
 	for(int j = 2; j>=0; j--){
-	  glVertex3f(spaceship[i].vertices[j][0], -1*spaceship[i].vertices[j][1], spaceship[i].vertices[j][2]);
+	  glVertex3f(spaceship[i].vertices[j][0], spaceship[i].vertices[j][1], spaceship[i].vertices[j][2]);
 	}
 	glColor3f(0.4, 0.4, 0.4);
-  }
-  glEnd();
-  glPopMatrix();
-
-  // Draw a pipe
-  glPushMatrix();
-  glTranslatef(0, 0, 50-zpos);
-  glColor3f(0.5, 0.25, 0.25);
-  glBegin(GL_TRIANGLES);
-  for(int i = 0; i<asteroids.size(); i++){
-	glNormal3f(asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
-	for(int j = 2; j>=0; j--){
-	  glVertex3f(asteroids[i].vertices[j][0], asteroids[i].vertices[j][1], asteroids[i].vertices[j][2]);
-	}
   }
   glEnd();
   glPopMatrix();
@@ -114,7 +130,7 @@ void init(){
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   //  gluPerspective(85, window_width/window_height, 1, 25);
-  glOrtho(-1.5, 1.5, -1.5, 1.5, -10, 10);
+  glOrtho(-5.5, 5.5, -5.5, 5.5, -10, 10);
   
   glShadeModel(GL_SMOOTH);
   glEnable(GL_CULL_FACE);
@@ -190,9 +206,9 @@ void reshape(int w, int h){
   //  gluPerspective(85, w/h, 1, 25);
 
   if(w <= h)
-	glOrtho (-1.5, 1.5, -1.5*(GLfloat)h/(GLfloat)w, 1.5*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
+	glOrtho (-10.5, 10.5, -10.5*(GLfloat)h/(GLfloat)w, 10.5*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
   else
-	glOrtho (-1.5*(GLfloat)w/(GLfloat)h, 1.5*(GLfloat)w/(GLfloat)h, -1.5, 1.5, -10.0, 10.0);
+	glOrtho (-10.5*(GLfloat)w/(GLfloat)h, 10.5*(GLfloat)w/(GLfloat)h, -10.5, 10.5, -10.0, 10.0);
 
   glutPostRedisplay();
 }
@@ -207,7 +223,7 @@ int main(int argc, char **argv){
 
   glutReshapeFunc(reshape);
   glutDisplayFunc(display);
-  //  glutIdleFunc(flight);
+  glutIdleFunc(flight);
   glutKeyboardFunc(key);
   glutKeyboardUpFunc(keyUp);
   glutSetKeyRepeat(0);
