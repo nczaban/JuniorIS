@@ -52,9 +52,23 @@ The shapes are individually created using OpenSCAD, a program for computer assis
     rotate(90, [1,0,0]) sphere(r=10, \$fn=50);
   }
 \end{lstlisting}
-The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Cylinders have independantly defined radii for both ends; a cone can be created by setting one radius to 0. As seen in the \texttt{rotate} call, vectors are contained within square brackets.For the sake of simplicity, and to better explore the possibilities of CSG, only rectangular prisms, cones, cylinders, and spheres were used to build each object. For transformations, only rotate and translate were used.\\
+The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Cylinders have independantly defined radii for both ends; a cone can be created by setting one radius to 0. As seen in the \texttt{rotate} call, vectors are contained within square brackets. For the sake of simplicity, and to better explore the possibilities of CSG, only rectangular prisms, cones, cylinders, and spheres were used to build each object. For transformations, only rotate and translate were used.\\
 
-\noindent In order to 
+\noindent In order to manipulate the objects created with OpenSCAD, the CSG objects were exported in .stl files. Each file is formatted in the same way:
+\begin{lstlisting}
+  facet normal 0.603056 0.409837 0.684366
+    outer loop
+      vertex 3.33769 2.42497 3.63721
+      vertex 3.14634 2.28595 3.88909
+      vertex 3.48337 2.21061 3.63721
+    endloop
+  endfacet
+\end{lstlisting}
+The object is broken down into a series of triangles and a normal vector is calculated. Using this pattern, the .stl files were read by the helper program, stlReader.cpp, and fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment.\\
+
+\noindent stlReader.cpp uses the struct \texttt{Facet} to store the data for each triangle, with each \texttt{Facet} being added to a vector containing all the pieces of the shape. The helper program is currently only configured to read .stl files that use the ASCII-style layout, and cannot read binary .stl files.\\
+
+\noindent In total, seven objects were created using OpenSCAD. These include, but are not limited to, a die, a taurus, an asteroid, a spaceship, and an abstract cookie-cutter.
 \subsubsection{OpenGL Implementation}
 \subsection{Asteroids}
 \section{Conclusion}
