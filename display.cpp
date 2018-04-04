@@ -15,7 +15,6 @@
 // Semester: Spring year
 // Instructor: D. Byrnes
 // Date: 2/19/18
-// Sources consulted: any books consulted in writing the program
 // Program description: Using the function in stlReader.cpp, create a model of a CSG object with OpenGL's TRIANGLES primitive.
 // Known bugs: Program does not check to see if the file is of type STL before running. On occasion, some triangles on the shape will not be drawn correctly; this issue is resolved on repeat executions.
 // Instructions: Compile and run on the command line. Type the name of the STL file as the first command line argument when running. Click and move the mouse to rotate the object in space. Press 'q' to exit the program.

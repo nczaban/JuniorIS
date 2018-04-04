@@ -10,7 +10,7 @@
 \usepackage[letterpaper, margin=1in]{geometry}
 \addtolength{\topmargin}{-0.5in}
 
-\lstset{language=C++, upquote=true, breaklines=true}
+\lstset{language=C++, upquote=true, breaklines=true, showstringspaces=false}
 
 \lstdefinelanguage{scad}
 {
@@ -60,7 +60,7 @@ The shapes are individually created using OpenSCAD, a program for computer assis
     rotate(90, [1,0,0]) sphere(r=10, \$fn=50);
   }
 \end{lstlisting}
-The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Cylinders have independantly defined radii for both ends; a cone can be created by setting one radius to 0. As seen in the \texttt{rotate} call, vectors are contained within square brackets. For the sake of simplicity, and to better explore the possibilities of CSG, only rectangular prisms, cones, cylinders, and spheres were used to build each object. For transformations, only rotate and translate were used.\\
+The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Cylinders have independently defined radii for both ends; a cone can be created by setting one radius to 0. As seen in the \texttt{rotate} call, vectors are contained within square brackets. For the sake of simplicity, and to better explore the possibilities of CSG, only rectangular prisms, cones, cylinders, and spheres were used to build each object. For transformations, only rotate and translate were used.\\
 
 In order to manipulate the objects created with OpenSCAD, the CSG objects were exported in .stl files. Each file is formatted in the same way:
 \begin{lstlisting}
@@ -74,25 +74,34 @@ In order to manipulate the objects created with OpenSCAD, the CSG objects were e
 \end{lstlisting}
 The object is broken down into a series of triangles and a normal vector is calculated. Using this pattern, the .stl files were read by the helper program, stlReader.cpp. stlReader.cpp uses the struct \texttt{Facet} to store the data for each triangle, with each \texttt{Facet} being added to a vector containing all the pieces of the shape. The helper program is currently only configured to read .stl files that use the ASCII-style layout, and cannot read binary .stl files.\\
 
-In total, seven objects were created using OpenSCAD. These include, but are not limited to: a die, a torus, an asteroid, a spaceship, and an abstract cookie-cutter.
+In total, seven objects were created using OpenSCAD. These include, but are not limited to: a die, a torus, an asteroid, a spaceship, and a 6-sided cookie-cutter.
 \subsubsection{OpenGL Implementation}
-Once the .stl file is parsed, the vector of \texttt{Facet}s is fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment. The display program uses a white specular point light and a material shininess of 50. A \texttt{mouse} and \texttt{motion} function enable the user to rotate the object on its axis, with the rotations being performed within the \texttt{display} function. Within the \texttt{glBegin} and \texttt{glEnd} block, the vector \texttt{newShape} is scanned, with each \texttt{Facet}'s normal vector and vertices passed to the respective OpenGL command. In order to correctly light the objects, the vertices are passed in the reverse order they were printed in the .stl file.
+Once the .stl file is parsed, the vector of \texttt{Facet}s is fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment. The display program uses a white specular point light and a material shininess of 50. A \texttt{mouse} and \texttt{motion} function enable the user to rotate the object on its axis, with the rotations being performed within the \texttt{display} function; the user can also quit the program with the 'q' key. Within the \texttt{glBegin} and \texttt{glEnd} block, the vector \texttt{newShape} is scanned, with each \texttt{Facet}'s normal vector and vertices passed to the respective OpenGL command. OpenSCAD uses a right-handed coordinate system while OpenGL uses a left-handed system; thus, the vertices are passed in the reverse order they were printed in the .stl file in order to correctly light the objects.
 \subsection{Asteroids}
+The second implementation of constructive solid geometry is an interactive game, where the user controls a spaceship and avoids asteroids. In comparison to the display program, this program enables the \texttt{GL{\bf\_}COLOR{\bf\_}MATERIAL} state in its \texttt{init} call, which allows the \texttt{glColor} function to be used in conjunction with lighting. The spaceship surface is colored a light grey, with the engine trails colored blue; the asteroids are colored red. The game removes the mouse-controlled camera in place of a static camera set with the \texttt{gluLookAt} function. Additionally, more key bindings are added to control the movement of the spaceship. Each of the WASD keys has a respective boolean variable that is set to true when the key is pressed and false when the key is released. This method allows for diagonal movement as well as cardinal movement. 
 \section{Conclusion}
+
 \newpage
 \end{doublespace}
 \begin{onehalfspace}
-\section{Appendix}
+\section{Source Code}
 \subsection{OpenSCAD}
 \subsubsection{die.scad}
 \subsubsection{connector.scad}
 \subsubsection{torus.scad}
 \subsubsection{asteroid.scad}
+\subsubsection{pipes.scad}
+\subsubsection{spaceship.scad}
+\subsubsection{cookie\_cutter.scad}
+
 \subsection{C++}
 \subsubsection{stlReader.cpp}
-%\lstinputlisting[language=C++]{stlReader.cpp}
+% \lstinputlisting[language=C++]{stlReader.cpp}
 \subsubsection{display.cpp}
-%\lstinputlisting[language=C++]{display.cpp}
+% \lstinputlisting[language=C++]{display.cpp}
+\subsubsection{game.cpp}
+% \lstinputlisting[language=C++]{game.cpp}
+
 \newpage
 \begin{thebibliography}{10}
 \bibitem{cs_dictionary}

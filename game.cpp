@@ -66,9 +66,7 @@ void flight(){
 }
 
 void setup_scene(){
-  gluLookAt(0,-1,5,
-			0,0,0,
-			0,1,0);
+  gluLookAt(0, -1, 5,    0, 0, 0,     0,1,0);
 
   glRotatef(-25,0,1,0);
   // Draw the spaceship
