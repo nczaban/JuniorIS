@@ -32,16 +32,22 @@
 \begin{doublespace}
 \section{Constructive Solid Geometry}
 \subsection{General Concepts}
-Constructive Solid Geometry (CSG) is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include unions, intersections, and differences; the types of shapes vary from one implementation to another, but generally include spheres, cubes, and cylinders, as well as their standard transformations (rotations, scaling, translations)\cite{cs_dictionary}. This technique provides a simpler way to create three-dimensional shapes without the need to define each vertex
+Constructive Solid Geometry (CSG) is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include unions, intersections, and differences; the types of shapes vary from one implementation to another, but generally include spheres, cubes, and cylinders, as well as their standard transformations (rotations, scaling, translations)\cite{cs_dictionary}. This technique provides a simpler way to create three-dimensional shapes without the need to define each individual vertex or face.\\
+
+Constructive Solid Geometry are organized in binary trees, where leaf nodes are the solid primitives and interior nodes are the boolean operations. The object is then created recursively, with each boolean operation being replaced by the object which it created\cite{gold}.
 \subsubsection{Real-Time Rendering and Image-Based CSG}
 One substantial category in CSG is the difference between Real-Time Rendering of CSG objects and Image-Based CSG objects. Real-time rendering poses a number of issues, particularly for shapes that are interactively modified during runtime. While real-time rendering can be accomplished by passing the shape as a mathematically calculated model, this solution is more applicable to static CSG shapes and does not work well for interactive modifications\cite{open_csg}. The alternative solution, image-based rendering algorithms, avoid most of the complex boundary calculations of constructive solid geometry by storing only an image of the shape in the frame buffer\cite{open_csg}. 
 \subsection{Use in Computer Graphics}
 \subsubsection{Interactive Modification}
 \subsubsection{Ray Tracing}
 \subsection{CSG Algorithms}
-Given the rendering complexity of constructive solid geometry, several algorithms have been developed to improve the speed and quality of CSG primitives. These include the Goldfeather Algorithm, the layered Goldfeather algorithm, and Sequenced Convex Subtraction (SCS) algorithm\cite{hardware_csg}. Goldfeather's algorithm quickly became the precursor to all image-based CSG algorithms. \\
+Given the rendering complexity of constructive solid geometry, several algorithms have been developed to improve the speed and quality of CSG primitives. These include the Goldfeather Algorithm, the layered Goldfeather algorithm, and Sequenced Convex Subtraction (SCS) algorithm. The Goldfeather algorithm quickly became the precursor to all image-based CSG algorithms\cite{hardware_csg}.\\
 
-There are other, more minute techniques that can improve performance when rendering CSG objects. In Nicholas Wilt's implementation of CSG in the Object Oriented Ray Tracing (OORT) class library, complicated calculations can be short-circuited by creating optimized CSG trees where simpler objects are the left children of each boolean operation. In OORT, ray tracing calculations between two objects on a CSG tree always test against the left object first. Thus, functions like \texttt{CSGIntersection} can avoid testing rays against more complex shapes if the left shape returns FALSE\cite{raytrace}.\\
+Goldfeather's algorithm, originally designed for the Pixel-Planes graphics hardware, uses partial products to allow effectively use the z-buffer on supported graphics hardware\cite{hardware_csg}. The algorithm is of two parts: the passed CSG tree is first restructured into an equivalent tree more easily used by the second portion of the algorithm, which traverses the new tree and returns quadratic coefficients to be read by Pixel-Powers\cite{gold}. Pixel-Powers, an extension of Pixel-Planes, calculates the values of a quadratic function $Ax^2 + Bxy + Cy^2 + Dx + Ey + F$, where $x$ and $y$ are screen coordinates. \\
+
+In their extension of Goldfeather's algorithm, Stewart et. al. exploit instances where the maximum depth complexity $k$ (the number of primitives covering each pixel) is less than the number of primitives $n$ in a normalized CSG tree\cite{layered_gold}.\\
+
+In addition to the core algorithms, there are other, more minute techniques that can improve performance when rendering CSG objects. In Nicholas Wilt's implementation of CSG in the Object Oriented Ray Tracing (OORT) class library, complicated calculations can be short-circuited by creating optimized CSG trees where simpler objects are the left children of each boolean operation. In OORT, ray tracing calculations between two objects on a CSG tree always test against the left object first. Thus, functions like \texttt{CSGIntersection} can avoid testing rays against more complex shapes if the left shape returns FALSE\cite{raytrace}.
 \section{Software}
 \subsection{Display Program}
 The first implementation of constructive solid geometry is a simple display program. It takes as a command-line argument an .stl file, containing the vertices of the shape to be rendered in OpenGL. The shape can be rotated on its axis by clicking and dragging the shape.
@@ -56,7 +62,7 @@ The shapes are individually created using OpenSCAD, a program for computer assis
 \end{lstlisting}
 The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Cylinders have independantly defined radii for both ends; a cone can be created by setting one radius to 0. As seen in the \texttt{rotate} call, vectors are contained within square brackets. For the sake of simplicity, and to better explore the possibilities of CSG, only rectangular prisms, cones, cylinders, and spheres were used to build each object. For transformations, only rotate and translate were used.\\
 
-\noindent In order to manipulate the objects created with OpenSCAD, the CSG objects were exported in .stl files. Each file is formatted in the same way:
+In order to manipulate the objects created with OpenSCAD, the CSG objects were exported in .stl files. Each file is formatted in the same way:
 \begin{lstlisting}
   facet normal 0.603056 0.409837 0.684366
     outer loop
@@ -66,12 +72,11 @@ The \texttt{intersection()} function takes no inputs in its declaration, instead
     endloop
   endfacet
 \end{lstlisting}
-The object is broken down into a series of triangles and a normal vector is calculated. Using this pattern, the .stl files were read by the helper program, stlReader.cpp, and fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment.\\
+The object is broken down into a series of triangles and a normal vector is calculated. Using this pattern, the .stl files were read by the helper program, stlReader.cpp. stlReader.cpp uses the struct \texttt{Facet} to store the data for each triangle, with each \texttt{Facet} being added to a vector containing all the pieces of the shape. The helper program is currently only configured to read .stl files that use the ASCII-style layout, and cannot read binary .stl files.\\
 
-\noindent stlReader.cpp uses the struct \texttt{Facet} to store the data for each triangle, with each \texttt{Facet} being added to a vector containing all the pieces of the shape. The helper program is currently only configured to read .stl files that use the ASCII-style layout, and cannot read binary .stl files.\\
-
-\noindent In total, seven objects were created using OpenSCAD. These include, but are not limited to, a die, a taurus, an asteroid, a spaceship, and an abstract cookie-cutter.
+In total, seven objects were created using OpenSCAD. These include, but are not limited to, a die, a taurus, an asteroid, a spaceship, and an abstract cookie-cutter.
 \subsubsection{OpenGL Implementation}
+Once the .stl file is parsed, the vector of \texttt{Facet}s is fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment. The display program 
 \subsection{Asteroids}
 \section{Conclusion}
 \newpage
@@ -85,12 +90,16 @@ The object is broken down into a series of triangles and a normal vector is calc
 \newpage
 \begin{thebibliography}{10}
 \bibitem{cs_dictionary}
-  Andrew Butterfield and Gerard Ngondi,
+  Butterfield, Andrew and Gerard Ngondi,
   \textit{A Dictionary of Computer Science},
   Oxford University Press,
   7th edition,
   2016
 
+\bibitem{gold}
+  Goldfeather, Jack, Jeff Hultquist, and Henry Fuchs. ``Fast Constructive Solid Geometry in the Pixel-Powers Graphics System.'' {\it Computer Graphics, SIGGRAPH '86 Proceedings}, vol. 20, no. 4, 1986,
+pp. 107-116
+  
 \bibitem{hardware_csg}
   Kirsch, Florian and J\"{u}rgen D\"{o}llner. ``Rendering Techniques for Hardware-Accelerated Image-Based CSG.'' {\it Journal of WSCG}, vol. 12, no. 2, 2004, pp. 221-228.
 
@@ -102,6 +111,9 @@ The object is broken down into a series of triangles and a normal vector is calc
 
 \bibitem{geoinformation}
   Ooms, Kristien. ``A 3D inclusion test on large dataset.'' {\it Developments in 3D Geo-Information Sciences}. Edited by Philippe De Maeyer and Tijs Neutens. Springer, New York, 2010.
+
+\bibitem{layered_gold}
+  Stewart, Nigel, Geoff Leach, and Sabu John. ``An Improved Z-Buffer CSG Rendering Algorithm.'' {\it 1998 Eurographics / SIGGRAPH Workshop on Graphics Hardware}, ACM, 25-30, 1998.
 
 \bibitem{raytrace}
   Wilt, Nicholas. {\it Object-Oriented Ray Tracing in C++}. John Wiley \& Sons, New York, 1994, pp 207-227.
