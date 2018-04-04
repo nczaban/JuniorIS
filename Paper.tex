@@ -74,19 +74,25 @@ In order to manipulate the objects created with OpenSCAD, the CSG objects were e
 \end{lstlisting}
 The object is broken down into a series of triangles and a normal vector is calculated. Using this pattern, the .stl files were read by the helper program, stlReader.cpp. stlReader.cpp uses the struct \texttt{Facet} to store the data for each triangle, with each \texttt{Facet} being added to a vector containing all the pieces of the shape. The helper program is currently only configured to read .stl files that use the ASCII-style layout, and cannot read binary .stl files.\\
 
-In total, seven objects were created using OpenSCAD. These include, but are not limited to, a die, a taurus, an asteroid, a spaceship, and an abstract cookie-cutter.
+In total, seven objects were created using OpenSCAD. These include, but are not limited to: a die, a torus, an asteroid, a spaceship, and an abstract cookie-cutter.
 \subsubsection{OpenGL Implementation}
-Once the .stl file is parsed, the vector of \texttt{Facet}s is fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment. The display program 
+Once the .stl file is parsed, the vector of \texttt{Facet}s is fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment. The display program uses a white specular point light and a material shininess of 50. A \texttt{mouse} and \texttt{motion} function enable the user to rotate the object on its axis, with the rotations being performed within the \texttt{display} function. Within the \texttt{glBegin} and \texttt{glEnd} block, the vector \texttt{newShape} is scanned, with each \texttt{Facet}'s normal vector and vertices passed to the respective OpenGL command. In order to correctly light the objects, the vertices are passed in the reverse order they were printed in the .stl file.
 \subsection{Asteroids}
 \section{Conclusion}
 \newpage
 \end{doublespace}
 \begin{onehalfspace}
 \section{Appendix}
-\subsection{stlReader.cpp}
-\lstinputlisting[language=C++]{stlReader.cpp}
-\subsection{display.cpp}
-\lstinputlisting[language=C++]{display.cpp}
+\subsection{OpenSCAD}
+\subsubsection{die.scad}
+\subsubsection{connector.scad}
+\subsubsection{torus.scad}
+\subsubsection{asteroid.scad}
+\subsection{C++}
+\subsubsection{stlReader.cpp}
+%\lstinputlisting[language=C++]{stlReader.cpp}
+\subsubsection{display.cpp}
+%\lstinputlisting[language=C++]{display.cpp}
 \newpage
 \begin{thebibliography}{10}
 \bibitem{cs_dictionary}

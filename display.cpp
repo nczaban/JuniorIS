@@ -43,7 +43,6 @@ void display(){
   glPushMatrix();
   glRotatef(-1*angle2, 1.0, 0.0, 0.0);
   glRotatef(-1*angle, 0.0, 1.0, 0.0);
-  glColor3f(1.0, 0.0, 0.0);
   glBegin(GL_TRIANGLES);
   for(int i = 0; i<newShape.size(); i++){
 	glNormal3f(newShape[i].normal[0], newShape[i].normal[1], newShape[i].normal[2]);
