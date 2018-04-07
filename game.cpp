@@ -23,9 +23,6 @@
 
 GLint window_width = 700;
 GLint window_height = 700;
-static int moving = 0, startx = 0, starty = 0;
-static GLfloat angle = 0;
-static GLfloat angle2 = 180;
 static GLfloat xpos = 0;
 static GLfloat ypos = 0;
 static GLfloat zpos = 0;
@@ -37,13 +34,18 @@ GLfloat light_position[] = {0.0, 3.0, -5.0, 0.0};
 std::vector<Facet> asteroids = readFile("asteroid.stl");
 std::vector<Facet> pipe = readFile("pipes.stl");
 std::vector<Facet> spaceship = readFile("spaceship.stl");
+std::vector<Facet> connector = readFile("connector.stl");
 
 bool upKey, leftKey, rightKey, downKey;
+float r1, r2, r3;
 
 void flight(){
   // Change spaceship position
   zpos -= speed;
   if(zpos <= -100){
+	r1 = float(rand())/RAND_MAX;
+	r2 = float(rand())/RAND_MAX;
+	r3 = float(rand())/RAND_MAX;
 	zpos = 0;
 	speed += 0.01;
   }
@@ -93,12 +95,12 @@ void setup_scene(){
 
   // Draw a pipe
   glPushMatrix();
-  glTranslatef(0,0,-25-zpos);
-  glRotatef(-1.5*zpos, 0, 0, 0.8);
+  glTranslatef((20*r3)-10, (20*r1)-10, -25-zpos);
+  glRotatef(-1.5*zpos, r1, r2, r3);
   glColor3f(0.6, 0.6, 0.6);
   glBegin(GL_TRIANGLES);
   for(int i = 0; i<pipe.size(); i++){
-	glNormal3f(pipe[i].normal[0], pipe[i].normal[1], pipe[i].normal[2]);
+	glNormal3f(-1*pipe[i].normal[0], pipe[i].normal[1], pipe[i].normal[2]);
 	for(int j = 2; j>=0; j--){
 	  glVertex3f(pipe[i].vertices[j][0], pipe[i].vertices[j][1], -1*pipe[i].vertices[j][2]);
 	}
@@ -108,14 +110,29 @@ void setup_scene(){
 
   // Draw an asteroid
   glPushMatrix();
-  glTranslatef(0, 0, -50-zpos);
-  glRotatef(-1.5*zpos, 0.4, 0.7, 1);
+  glTranslatef((20*r1)-10, (20*r2)-10, -50-zpos);
+  glRotatef(-1.5*zpos, -r3, r1, r2);
   glColor3f(0.5, 0.25, 0.25);
   glBegin(GL_TRIANGLES);
   for(int i = 0; i<asteroids.size(); i++){
-  	glNormal3f(asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
+  	glNormal3f(-1*asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
   	for(int j = 2; j>=0; j--){
   	  glVertex3f(asteroids[i].vertices[j][0], asteroids[i].vertices[j][1], -1*asteroids[i].vertices[j][2]);
+  	}
+  }
+  glEnd();
+  glPopMatrix();
+
+  // Draw a hollow die
+  glPushMatrix();
+  glTranslatef((20*r2)-10, (20*r1)-10, -75-zpos);
+  glRotatef(-1.5*zpos, r2, -r3, r1);
+  glColor3f(0.25, 0.5, 0);
+  glBegin(GL_TRIANGLES);
+  for(int i = 0; i<connector.size(); i++){
+  	glNormal3f(-1*connector[i].normal[0], connector[i].normal[1], connector[i].normal[2]);
+  	for(int j = 2; j>=0; j--){
+  	  glVertex3f(connector[i].vertices[j][0], connector[i].vertices[j][1], -1*connector[i].vertices[j][2]);
   	}
   }
   glEnd();
@@ -135,6 +152,10 @@ void display (void) {
 }
 
 void init(){
+  r1 = float(rand())/RAND_MAX;
+  r2 = float(rand())/RAND_MAX;
+  r3 = float(rand())/RAND_MAX;
+
   glClearColor(0.1, 0.1, 0.1, 1.0);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -193,30 +214,8 @@ void keyUp(unsigned char keystroke, int x, int y){
   }
 }
 
-static void mouse(int button, int state, int x, int y){
-  if (button == GLUT_LEFT_BUTTON){
-    if (state == GLUT_DOWN){
-      moving = 1;
-      startx = x;
-      starty = y;
-    }
-    if (state == GLUT_UP){
-      moving = 0;
-    }
-  }
-}
-
-static void motion(int x, int y){
-  if(moving){
-	angle = angle + (x - startx);
-	angle2 = angle2 + (y - starty);
-	startx = x;
-	starty = y;
-	glutPostRedisplay();
-  }
-}
-
 int main(int argc, char **argv){
+  srand(time(NULL));  
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
   glutInitWindowSize(window_width, window_height);
@@ -230,8 +229,6 @@ int main(int argc, char **argv){
   glutKeyboardFunc(key);
   glutKeyboardUpFunc(keyUp);
   glutSetKeyRepeat(0);
-  glutMouseFunc(mouse);
-  glutMotionFunc(motion);
   glutMainLoop();
   return 0;
 }
