@@ -4,6 +4,8 @@
 % PREAMBLE
 \usepackage{times}
 \usepackage{courier}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
 \usepackage{setspace}
 \usepackage{textcomp}
 \usepackage{listings}
@@ -43,7 +45,13 @@ One substantial category in CSG is the difference between Real-Time Rendering of
 \subsection{CSG Algorithms}
 Given the rendering complexity of constructive solid geometry, several algorithms have been developed to improve the speed and quality of CSG primitives. These include the Goldfeather Algorithm, the layered Goldfeather algorithm, and Sequenced Convex Subtraction (SCS) algorithm.\\
 
-Goldfeather's algorithm quickly became the precursor to all image-based CSG algorithms\cite{hardware_csg}. The algorithm, originally designed for the Pixel-Planes graphics hardware, uses partial products to allow effectively use the z-buffer on supported graphics hardware\cite{hardware_csg}. The algorithm is of two parts: the passed CSG tree is first restructured into an equivalent tree more easily used by the second portion of the algorithm, which traverses the new tree and returns quadratic coefficients to be read by Pixel-Powers\cite{gold}. Pixel-Powers, an extension of Pixel-Planes, calculates the values of a quadratic function $Ax^2 + Bxy + Cy^2 + Dx + Ey + F$, where $x$ and $y$ are screen coordinates. When perfoming CSG operations in this algorithm, the visible section of the first object is stored in a z-buffer, denoted in Goldfeather's paper as \texttt{ZMIN}, and the visible section of the second object is stored in another z-buffer, denoted \texttt{ZTEMP}. Then, for each pixel in the screen, if the value of \texttt{ZTEMP} is less than (i.e. closer to the screen) \texttt{ZMIN}, a flag \texttt{F1} is set to true.\\
+Goldfeather's algorithm quickly became the precursor to all image-based CSG algorithms\cite{hardware_csg}. The algorithm, originally designed for the Pixel-Planes graphics hardware, uses partial products to allow effectively use the z-buffer on supported graphics hardware\cite{hardware_csg}. The algorithm is of two parts: the passed CSG tree is first restructured into an equivalent tree more easily used by the second portion of the algorithm, which traverses the new tree and returns quadratic coefficients to be read by Pixel-Powers\cite{gold}. Pixel-Powers, an extension of Pixel-Planes, calculates the values of a quadratic function $Ax^2 + Bxy + Cy^2 + Dx + Ey + F$, where $x$ and $y$ are screen coordinates.\\
+
+When perfoming CSG unions in this algorithm, the visible section of the first object is stored in a z-buffer, denoted in Goldfeather's paper as \texttt{ZMIN}, and the visible section of the second object is stored in another z-buffer, denoted \texttt{ZTEMP}. For all the pixels in the visible area of the second object, a flag \texttt{F1} is set to true. Then, for any pixels where \texttt{F1} is set, if \texttt{ZTEMP} greater than \texttt{ZMIN} (i.e. the second object is deeper in model space than the first object), the \texttt{F1} flag is cleared. The remaining pixels with \texttt{F1} set represent areas where the second object is visible from behind the first object. Both objects are then drawn without any overlap.\\
+
+In difference operations, the flag \texttt{F1} is set for all pixels of the first object and the front faces are stored in \texttt{ZTEMP}. If the \texttt{ZTEMP} values lie between the front and back of the second object, \texttt{F1} is cleared. The remaining \texttt{F1} pixels are not within the second object, but are on the front of the first object; the corresponding values of \texttt{ZTEMP} are passed into \texttt{ZMIN}.\\
+
+For intersection problems, \texttt{F1} is set for the front of the first object, then cleared if the value of \texttt{ZTEMP} is not between the front and back of the second object. Then, the same comparison is made with the second object stored in \texttt{ZTEMP} and compared between the front and back faces of the first object. Only the pixels with the flag set for both sets are drawn.\\
 
 In their extension of Goldfeather's algorithm, Stewart et. al. exploit instances where the maximum depth complexity $k$ (the number of primitives covering each pixel) is less than the number of primitives $n$ in a normalized CSG tree\cite{layered_gold}.\\
 
@@ -76,30 +84,41 @@ The object is broken down into a series of triangles and a normal vector is calc
 
 In total, seven objects were created using OpenSCAD. These include, but are not limited to: a die, a torus, an asteroid, a spaceship, and a 6-sided cookie-cutter.
 \subsubsection{OpenGL Implementation}
-Once the .stl file is parsed, the vector of \texttt{Facet}s is fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment. The display program uses a white specular point light and a material shininess of 50. A \texttt{mouse} and \texttt{motion} function enable the user to rotate the object on its axis, with the rotations being performed within the \texttt{display} function; the user can also quit the program with the 'q' key. Within the \texttt{glBegin} and \texttt{glEnd} block, the vector \texttt{newShape} is scanned, with each \texttt{Facet}'s normal vector and vertices passed to the respective OpenGL command. OpenSCAD uses a right-handed coordinate system while OpenGL uses a left-handed system; thus, the vertices are passed in the reverse order they were printed in the .stl file in order to correctly light the objects.
+Once the .stl file is parsed, the vector of \texttt{Facet}s is fed into OpenGL's \texttt{GL{\bf\_}TRIANGLES} primitive to rebuild the object in a more interactive environment. The display program uses a white specular point light and a material shininess of 50. A \texttt{mouse} and \texttt{motion} function enable the user to rotate the object on its axis, with the rotations being performed within the \texttt{display} function; the user can also quit the program with the 'q' key. Within the \texttt{glBegin} and \texttt{glEnd} block, the vector \texttt{newShape} is scanned, with each \texttt{Facet}'s normal vector and vertices passed to the respective OpenGL command. In order to correctly light the triangle elements, the vertices are passed in the reverse order of how were printed in the .stl file.
 \subsection{Asteroids}
-The second implementation of constructive solid geometry is an interactive game, where the user controls a spaceship and avoids asteroids. In comparison to the display program, this program enables the \texttt{GL{\bf\_}COLOR{\bf\_}MATERIAL} state in its \texttt{init} call, which allows the \texttt{glColor} function to be used in conjunction with lighting. The spaceship surface is colored a light grey, with the engine trails colored blue; the asteroids are colored red. For the engine color, the code checks to see if the normal vector is pointing in the same direction as the engines, as well as if the z-value of the triangle's first vertex is at -1.5, at the back of the ship. The game removes the mouse-controlled camera in place of a static camera set with the \texttt{gluLookAt} function. Additionally, more key bindings are added to control the movement of the spaceship. Each of the WASD keys has a respective boolean variable that is set to true when the key is pressed and false when the key is released. This method allows for diagonal movement as well as cardinal movement. 
+The second implementation of constructive solid geometry is an interactive game, where the user controls a spaceship and avoids asteroids. In comparison to the display program, this program enables the \texttt{GL{\bf\_}COLOR{\bf\_}MATERIAL} state in its \texttt{init} call, which allows the \texttt{glColor} function to be used in conjunction with lighting. The spaceship surface is colored a light grey, with the engine trails colored blue; the asteroids are colored red. For the engine color, the code checks to see if the normal vector is pointing in the same direction as the engines, as well as if the z-value of the triangle's first vertex is at -1.5, at the back of the ship. The game removes the mouse-controlled camera in place of a camera set with the \texttt{gluLookAt} function to constantly be directly behind the spaceship. Additionally, more key bindings are added to control the movement of the spaceship. Each of the WASD keys has a respective boolean variable that is set to true when the key is pressed and false when the key is released. This method allows for diagonal movement as well as cardinal movement. Although the display program used \texttt{glOrtho} to set up the projection, the game uses \texttt{gluProjection}. This change was needed in order to simulate the correct depth perception on the obstacles.\\
+
+In the idle loop of the game, the position values of the spaceship are changed. If one of the directional booleans is true, \texttt{xpos} or \texttt{ypos} is changed accordingly. When the scene is redrawn, the camera position uses \texttt{xpos} and \texttt{ypos} to remain behind the ship. Another variable, \texttt{zpos} is also changed; this variable does not tranlate the spaceship itself, but instead translates all other obstacles onscreen. The \texttt{zpos} variable is cyclical; once the value is less than -100, \texttt{zpos} is reset to 0, and the \texttt{speed}, \texttt{zpos}'s rate of change, is increased.\\
+
+The increased movement of the game objects highlighted one major challenge of converting the OpenSCAD designs to OpenGL. OpenSCAD uses a right-handed coordinate system, while OpenGL uses a left-handed system. As the objects moved towards and away from the camera, parts of the objects that should have been hidden were visible, and vice versa. For example, the spaceship engines jut out from the back of the ship. Thus, a viewer positioned in between the two engines should be able to see the right curve of the left engine and the left curve of the right engine, as shown below left. However, the viewer instead could see the left curve of the left engine and the right curve of the right engine, as seen below right; this perspective made the engines appear recessed instead of external. In order to solve this issue, the z-coordinate of each vertex was multiplied by -1. 
+\begin{figure}[h]
+  \includegraphics[width=8cm]{GoodPersp}
+  \includegraphics[width=8cm]{BadPersp}
+  \centering
+\end{figure}
+
+With the exception of the spaceship, the other objects are given random numbers to determine their position on the screen and their rotational speed. 
 \section{Conclusion}
 
 \newpage
 \end{doublespace}
 \begin{onehalfspace}
-\section{Source Code}
-\subsection{OpenSCAD}
-\subsubsection{die.scad}
-\subsubsection{connector.scad}
-\subsubsection{torus.scad}
-\subsubsection{asteroid.scad}
-\subsubsection{pipes.scad}
-\subsubsection{spaceship.scad}
-\subsubsection{cookie\_cutter.scad}
+\section*{Source Code}
+\subsection*{OpenSCAD}
+\subsubsection*{die.scad}
+\subsubsection*{connector.scad}
+\subsubsection*{torus.scad}
+\subsubsection*{asteroid.scad}
+\subsubsection*{pipes.scad}
+\subsubsection*{spaceship.scad}
+\subsubsection*{cookie\_cutter.scad}
 
-\subsection{C++}
-\subsubsection{stlReader.cpp}
+\subsection*{C++}
+\subsubsection*{stlReader.cpp}
 % \lstinputlisting[language=C++]{stlReader.cpp}
-\subsubsection{display.cpp}
+\subsubsection*{display.cpp}
 % \lstinputlisting[language=C++]{display.cpp}
-\subsubsection{game.cpp}
+\subsubsection*{game.cpp}
 % \lstinputlisting[language=C++]{game.cpp}
 
 \newpage
