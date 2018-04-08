@@ -34,17 +34,21 @@
 \begin{doublespace}
 \section{Constructive Solid Geometry}
 \subsection{General Concepts}
-Constructive Solid Geometry (CSG) is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include unions, intersections, and differences; the types of shapes vary from one implementation to another, but generally include spheres, cubes, and cylinders, as well as their standard transformations (rotations, scaling, translations)\cite{cs_dictionary}. This technique provides a simpler way to create three-dimensional shapes without the need to define each individual vertex or face.\\
+Constructive Solid Geometry (CSG) is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include unions, intersections, and differences; the types of shapes vary from one implementation to another, but generally include spheres, cubes, and cylinders, as well as their standard transformations (rotations, scaling, translations)\cite{cs_dictionary}. This technique provides a simpler way to create three-dimensional shapes without the need to define each individual vertex or face.CSG objects are organized in binary trees, where leaf nodes are the solid primitives and interior nodes are the boolean operations. The object is then created recursively from the leaves up, with each boolean operation being replaced by the object which it created\cite{gold}.
 
-Constructive Solid Geometry are organized in binary trees, where leaf nodes are the solid primitives and interior nodes are the boolean operations. The object is then created recursively, with each boolean operation being replaced by the object which it created\cite{gold}.
+\begin{figure}[h]
+  \includegraphics[width=16cm]{CSG}
+  \centering
+  \caption{The three types of CSG operations perfomed on a cube and a sphere: (from left) Union, Intersection, Difference}
+\end{figure}
 \subsubsection{Real-Time Rendering and Image-Based CSG}
-One substantial category in CSG is the difference between Real-Time Rendering of CSG objects and Image-Based CSG objects. Real-time rendering poses a number of issues, particularly for shapes that are interactively modified during runtime. While real-time rendering can be accomplished by passing the shape as a mathematically calculated model, this solution is more applicable to static CSG shapes and does not work well for interactive modifications\cite{open_csg}. The alternative solution, image-based rendering algorithms, avoid most of the complex boundary calculations of constructive solid geometry by storing only an image of the shape in the frame buffer\cite{open_csg}. 
+One substantial category in CSG is the difference between Real-Time Rendering of CSG objects and Image-Based CSG objects. With real-time rendering, the entirety of the object is rendered, while image-basedd techniques instead pass a two-dimensional image of the CSG shape. Real-time rendering poses a number of issues, particularly for shapes that are interactively modified during runtime. While real-time rendering can be accomplished by passing the shape as a mathematically calculated model, this solution is more applicable to static CSG shapes and does not work well for interactive modifications\cite{open_csg}. The alternative solution, image-based rendering algorithms, avoid most of the complex boundary calculations of constructive solid geometry by storing only an image of the shape in the frame buffer\cite{open_csg}.
 \subsection{Use in Computer Graphics}
 \subsubsection{Interactive Modification}
+In practice, CSG objects are typically rendered with either raycasting or boundary representations, both of which are fairly slow. Boundary representations in particular take a significant amount of time to generate, so the final objects are typically treated as static objects and are not modified\cite{advanced_opengl}. For instance, a scene where a cylindrical hole is slowly drilled in another shape would need to continually add more polygons to show the growing hole. Calculating the boundaries for each iteration of the shape would be inordinately complex. A raycasting method would be able to handle this scenario at the same efficiency as any other scenario, but the algorithm itself is still too slow for real-time rendering.
 \subsubsection{Ray Tracing}
 \subsection{CSG Algorithms}
 Given the rendering complexity of constructive solid geometry, several algorithms have been developed to improve the speed and quality of CSG primitives. Two such algorithms are the Goldfeather Algorithm and the layered Goldfeather algorithm.
-
 \subsubsection{Goldfeather Algorithm}
 Goldfeather's algorithm quickly became the precursor to all image-based CSG algorithms\cite{hardware_csg}. The algorithm, originally designed for the Pixel-Planes graphics hardware, uses partial products to allow effectively use the z-buffer on supported graphics hardware. The algorithm is of two parts: the passed CSG tree is first restructured into an equivalent tree more easily used by the second portion of the algorithm, which traverses the new tree and returns quadratic coefficients to be read by Pixel-Powers\cite{gold}. Pixel-Powers, an extension of Pixel-Planes, calculates the values of a quadratic function $Ax^2 + Bxy + Cy^2 + Dx + Ey + F$, where $x$ and $y$ are screen coordinates.\\
 
@@ -66,23 +70,32 @@ In addition to the core algorithms, there are other, more minute techniques that
 
 The Goldfeather algorithm uses two separate z-buffers, which can create issues on systems that do not support multiple z-buffers. Alternative approaches, such as copying one set of z-values into main memory, are inadequately slow and values can lose exactness during copying. One workaround is to save the second z-buffer into another, unused buffer, such as the color buffer. Commonly referred to as render-to-texture, color data is discarded and the texels of the new p-buffer have a one-to-one match to the pixels in the frame buffer\cite{hardware_csg}.\\
 
-In the layered Goldfeather approach, the biggest detriment to its speed is reading from the stencil buffer to calculate the maximum depth complexity. However, with modern graphics hardware the depth complexity can be calculated without reading directly from the stencil buffer by using extensions built in to NVidia and ATI hardware, such as NV\_occlusion\_query\cite{hardware_csg}. 
+In the layered Goldfeather approach, the biggest detriment to its speed is reading from the stencil buffer to calculate the maximum depth complexity. However, with modern graphics hardware the depth complexity can be calculated without reading directly from the stencil buffer by using extensions built in to NVidia and ATI hardware, such as NV\_occlusion\_query\cite{hardware_csg}.\\
 
+Another performance-increasing method is to normalize the binary tree, which pushes union operations towards the root of the tree and difference/intersection operations towards the leaves\cite{advanced_opengl}. Although normalizing the tree can increase the height and number of primitives in the tree, overall the normal form can be processed more quickly. In the normalized tree, no intersection or difference node has a union operator in its left subtree, and a single primitive as its right child. As union operations, as opposed to difference and intersection, are additive, placing these nodes nearer to the root of the tree saves time, since the unimportant sections are removed earlier in the rendering process. To normalize the tree, several set properties are used recursively on the tree; $X-(Y\cup Z)=(X-Y)-Z$ and $X-(Y\cap Z) = (X-Y)\cup(X-Z)$, for example. Once the normal tree is created, extraneous nodes can be pruned; intersections and differences where the two objects do not touch are deleted or replaced with the left child, respectively.\\
+
+A more recent technique involves partitioning the scene into voxels instead of pixels using a method similar to Goldfeather's algorithm above, where each voxel of the scene has a flag determining whether it is inside or outside an object\cite{geoinformation}. There are two major variants on the voxelization process: voxelizing and combining each primitive, or voxelizing along rays. While the first method requires more memory, it is advantageous if the user requires the voxelized version of each subtree. Once this preprocessing phase is completed, inclusion tests can be performed in constant time. However, the voxelization method is still unsuitable for real-time use.
 \section{Software}
 \subsection{Display Program}
 The first implementation of constructive solid geometry is a simple display program. It takes as a command-line argument an .stl file, containing the vertices of the shape to be rendered in OpenGL. The shape can be rotated on its axis by clicking and dragging the shape.
 \subsubsection{CSG Usage}
-The shapes are individually created using OpenSCAD, a program for computer assisted design. The shapes are exported as .stl files, which can be read using the reader function located in \texttt{stlReader.cpp}. The code within a standard .scad file will look similar to this:
+The shapes are individually created using OpenSCAD, a program for computer assisted design. The shapes are exported as .stl files, which can be read using the reader function located in \texttt{stlReader.cpp}. An example of a typical .scad file is reproduced below.
 \lstset{language=scad}
+\begin{figure}[h]
 \begin{lstlisting}
   intersection() {
     cube(15, center=true);
     rotate(90, [1,0,0]) sphere(r=10, \$fn=50);
   }
 \end{lstlisting}
-The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block. \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12], center=true);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Cylinders have independently defined radii for both ends; a cone can be created by setting one radius to 0. As seen in the \texttt{rotate} call, vectors are contained within square brackets. For the sake of simplicity, and to better explore the possibilities of CSG, only rectangular prisms, cones, cylinders, and spheres were used to build each object. For transformations, only rotate and translate were used.\\
+\centering
+\caption{An exampe code segment from a .scad file}
+\end{figure}
+
+The \texttt{intersection()} function takes no inputs in its declaration, instead operating on the objects created within its code block; \texttt{union()} and \texttt{difference()} work in the same way. The \texttt{cube()} function can either create a regular cube when passed a single number, as above, or create rectangular prisms with user-defined dimensions. Instead of a single number, the user would pass the dimensions as such: \texttt{cube([15,10,12]);}. The \texttt{center=true} parameter sets the cube with its center at the origin; a parameter of \texttt{center=false} would draw the cube with its bottom corner at the origin. Cylinders have independently defined radii for both ends; a cone can be created by setting one radius to 0. As seen in the \texttt{rotate} call, vectors are contained within square brackets. For the sake of simplicity, and to better explore the possibilities of CSG, only rectangular prisms, cones, cylinders, and spheres were used to build each object. For transformations, only rotate and translate were used.\\
 
 In order to manipulate the objects created with OpenSCAD, the CSG objects were exported in .stl files. Each file is formatted in the same way:
+\begin{figure}[h]
 \begin{lstlisting}
   facet normal 0.603056 0.409837 0.684366
     outer loop
@@ -92,6 +105,10 @@ In order to manipulate the objects created with OpenSCAD, the CSG objects were e
     endloop
   endfacet
 \end{lstlisting}
+\centering
+\caption{A single triangle as saved in an ASCII .stl file}
+\end{figure}
+
 The object is broken down into a series of triangles and a normal vector is calculated. Using this pattern, the .stl files were read by the helper program, stlReader.cpp. stlReader.cpp uses the struct \texttt{Facet} to store the data for each triangle, with each \texttt{Facet} being added to a vector containing all the pieces of the shape. The helper program is currently only configured to read .stl files that use the ASCII-style layout, and cannot read binary .stl files.\\
 
 In total, seven objects were created using OpenSCAD. These include, but are not limited to: a die, a torus, an asteroid, a spaceship, and a 6-sided cookie-cutter.
@@ -102,7 +119,7 @@ The second implementation of constructive solid geometry is an interactive game,
 
 In the idle loop of the game, the position values of the spaceship are changed. If one of the directional booleans is true, \texttt{xpos} or \texttt{ypos} is changed accordingly. When the scene is redrawn, the camera position uses \texttt{xpos} and \texttt{ypos} to remain behind the ship. Another variable, \texttt{zpos} is also changed; this variable does not tranlate the spaceship itself, but instead translates all other obstacles onscreen. The \texttt{zpos} variable is cyclical; once the value is less than -100, \texttt{zpos} is reset to 0, and the \texttt{speed}, \texttt{zpos}'s rate of change, is increased.\\
 
-The increased movement of the game objects highlighted one major challenge of converting the OpenSCAD designs to OpenGL. OpenSCAD uses a right-handed coordinate system, while OpenGL uses a left-handed system. As the objects moved towards and away from the camera, parts of the objects that should have been hidden were visible, and vice versa. For example, the spaceship engines jut out from the back of the ship. Thus, a viewer positioned in between the two engines should be able to see the right curve of the left engine and the left curve of the right engine, as shown below left. However, the viewer instead could see the left curve of the left engine and the right curve of the right engine, as seen below right; this perspective made the engines appear recessed instead of external. In order to solve this issue, the z-coordinate of each vertex was multiplied by -1. 
+The increased movement of the game objects highlighted one major challenge of converting the OpenSCAD designs to OpenGL. OpenSCAD uses a right-handed coordinate system, while OpenGL uses a left-handed system. As the objects moved towards and away from the camera, parts of the objects that should have been hidden were visible, and vice versa. For example, the spaceship engines jut out from the back of the ship. Thus, a viewer positioned in between the two engines should be able to see the right curve of the left engine and the left curve of the right engine, as shown below left. However, the viewer instead could see the left curve of the left engine and the right curve of the right engine, as seen below right; this perspective made the engines appear recessed instead of external. In order to solve this issue, the z-coordinate of each vertex was multiplied by -1. In conjunction with this fix, the x-value of each obstacle's normal vector was multiplied by -1. This change produced better lighting effects on the obstacles with the new vertex values. The normal vector for the spaceship was left as is.
 \begin{figure}[h]
   \includegraphics[width=8cm]{GoodPersp}
   \includegraphics[width=8cm]{BadPersp}
@@ -119,12 +136,16 @@ Three random floating-point variables between 0 and 1 are created on each cycle;
 \section*{Source Code}
 \subsection*{OpenSCAD}
 \subsubsection*{die.scad}
+% \lstinputlisting[language=scad]{die.scad}
 \subsubsection*{connector.scad}
+% \lstinputlisting[language=scad]{connector.scad}
 \subsubsection*{torus.scad}
 \subsubsection*{asteroid.scad}
 \subsubsection*{pipes.scad}
 \subsubsection*{spaceship.scad}
+% \lstinputlisting[language=scad]{spaceship.scad}
 \subsubsection*{cookie\_cutter.scad}
+% \lstinputlisting[language=scad]{cookie_cutter.scad}
 
 \subsection*{C++}
 \subsubsection*{stlReader.cpp}
