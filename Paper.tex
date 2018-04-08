@@ -47,6 +47,7 @@ One substantial category in CSG is the difference between Real-Time Rendering of
 \subsubsection{Interactive Modification}
 In practice, CSG objects are typically rendered with either raycasting or boundary representations, both of which are fairly slow. Boundary representations in particular take a significant amount of time to generate, so the final objects are typically treated as static objects and are not modified\cite{advanced_opengl}. For instance, a scene where a cylindrical hole is slowly drilled in another shape would need to continually add more polygons to show the growing hole. Calculating the boundaries for each iteration of the shape would be inordinately complex. A raycasting method would be able to handle this scenario at the same efficiency as any other scenario, but the algorithm itself is still too slow for real-time rendering.
 \subsubsection{Ray Tracing}
+When using raytracing algorithms for CSG, the boolean operations can be reduced to one-dimensional subproblems\cite{raytrace}. For example, a ray passing through two objects along its path would have line segments representing when the ray entered and exited each primitive. These line segments can then be subjected to the boolean operations. The resulting line segment will be equivalent to a line segment generated from a ray passing through the complete CSG primitive. Although individual ray calculations are fast, the excessive number of rays can make more complicated scenes unsuitable for real-time rendering\cite{interactive_csg}.
 \subsection{CSG Algorithms}
 Given the rendering complexity of constructive solid geometry, several algorithms have been developed to improve the speed and quality of CSG primitives. Two such algorithms are the Goldfeather Algorithm and the layered Goldfeather algorithm.
 \subsubsection{Goldfeather Algorithm}
@@ -89,7 +90,7 @@ The shapes are individually created using OpenSCAD, a program for computer assis
   intersection() {
     cube(15, center=true);
     rotate(90, [1,0,0]) sphere(r=10, \$fn=50);
-  }
+   }
 \end{lstlisting}
 \centering
 \caption{An exampe code segment from a .scad file}
@@ -132,7 +133,7 @@ The increased movement of the game objects highlighted one major challenge of co
 
 Three random floating-point variables between 0 and 1 are created on each cycle; these three variables determine the rotation and position of each obstacle onscreen. For the \texttt{glTranslate} calls, the random numbers are multiplied by 20 then subtracted by 10 to place it within the playing area; the \texttt{glRotate} calls use the random values as they are. Each of the three variables is shuffled in their usage in the objects, so that no object has the same rotation or position as another.
 \section{Conclusion}
-
+As a whole, the field of Constructive Solid Geometry poses a number of difficult problems for computer scientists. With real-time rendering infeasible, and the alternative algorithms only suitable in a handful of cases, there is still much research to be done. However, the existing solutions are more than adequate to produce usable and complete software, as evidenced by the display program and the asteroid game.
 \newpage
 \end{doublespace}
 \begin{onehalfspace}
@@ -143,8 +144,11 @@ Three random floating-point variables between 0 and 1 are created on each cycle;
 \subsubsection*{connector.scad}
 % \lstinputlisting[language=scad]{connector.scad}
 \subsubsection*{torus.scad}
+% \lstinputlisting[language=scad]{torus.scad}
 \subsubsection*{asteroid.scad}
+% \lstinputlisting[language=scad]{asteroid.scad}
 \subsubsection*{pipes.scad}
+% \lstinputlisting[language=scad]{pipes.scad}
 \subsubsection*{spaceship.scad}
 % \lstinputlisting[language=scad]{spaceship.scad}
 \subsubsection*{cookie\_cutter.scad}
