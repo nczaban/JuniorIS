@@ -32,9 +32,7 @@ GLfloat light_specular[] = {1, 1, 1, 1.0};
 GLfloat light_position[] = {0.0, 3.0, -5.0, 0.0};
 
 std::vector<Facet> asteroids = readFile("asteroid.stl");
-std::vector<Facet> pipe = readFile("pipes.stl");
 std::vector<Facet> spaceship = readFile("spaceship.stl");
-std::vector<Facet> connector = readFile("connector.stl");
 
 bool upKey, leftKey, rightKey, downKey;
 float r1, r2, r3;
@@ -93,26 +91,11 @@ void setup_scene(){
   glEnd();
   glPopMatrix();
 
-  // Draw a pipe
+  // Draw a series of asteroids
+  glColor3f(0.5, 0.25, 0.25);
   glPushMatrix();
   glTranslatef((20*r3)-10, (20*r1)-10, -25-zpos);
   glRotatef(-1.5*zpos, r1, r2, r3);
-  glColor3f(0.6, 0.6, 0.6);
-  glBegin(GL_TRIANGLES);
-  for(int i = 0; i<pipe.size(); i++){
-	glNormal3f(-1*pipe[i].normal[0], pipe[i].normal[1], pipe[i].normal[2]);
-	for(int j = 2; j>=0; j--){
-	  glVertex3f(pipe[i].vertices[j][0], pipe[i].vertices[j][1], -1*pipe[i].vertices[j][2]);
-	}
-  }
-  glEnd();
-  glPopMatrix();
-
-  // Draw an asteroid
-  glPushMatrix();
-  glTranslatef((20*r1)-10, (20*r2)-10, -50-zpos);
-  glRotatef(-1.5*zpos, -r3, r1, r2);
-  glColor3f(0.5, 0.25, 0.25);
   glBegin(GL_TRIANGLES);
   for(int i = 0; i<asteroids.size(); i++){
   	glNormal3f(-1*asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
@@ -123,16 +106,27 @@ void setup_scene(){
   glEnd();
   glPopMatrix();
 
-  // Draw a hollow die
+  glPushMatrix();
+  glTranslatef((20*r1)-10, (20*r2)-10, -50-zpos);
+  glRotatef(-1.5*zpos, -r3, r1, r2);
+  glBegin(GL_TRIANGLES);
+  for(int i = 0; i<asteroids.size(); i++){
+  	glNormal3f(-1*asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
+  	for(int j = 2; j>=0; j--){
+  	  glVertex3f(asteroids[i].vertices[j][0], asteroids[i].vertices[j][1], -1*asteroids[i].vertices[j][2]);
+  	}
+  }
+  glEnd();
+  glPopMatrix();
+
   glPushMatrix();
   glTranslatef((20*r2)-10, (20*r1)-10, -75-zpos);
   glRotatef(-1.5*zpos, r2, -r3, r1);
-  glColor3f(0.25, 0.5, 0);
   glBegin(GL_TRIANGLES);
-  for(int i = 0; i<connector.size(); i++){
-  	glNormal3f(-1*connector[i].normal[0], connector[i].normal[1], connector[i].normal[2]);
+  for(int i = 0; i<asteroids.size(); i++){
+  	glNormal3f(-1*asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
   	for(int j = 2; j>=0; j--){
-  	  glVertex3f(connector[i].vertices[j][0], connector[i].vertices[j][1], -1*connector[i].vertices[j][2]);
+  	  glVertex3f(asteroids[i].vertices[j][0], asteroids[i].vertices[j][1], -1*asteroids[i].vertices[j][2]);
   	}
   }
   glEnd();
