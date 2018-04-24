@@ -27,14 +27,24 @@
 }
 
 \begin{document}
+\begin{titlepage}
 \title{Constructive Solid Geometry for Interactive Environments}
 \author{Nicholas Czaban}
 \date{\today}
 \maketitle
+\begin{abstract}
+  One barrier to high-quality computer generated images is the exorbitant number of polygons and points needed to define a detailed object. Defining each vertex by hand would take a user hours for even the simplest shapes. One way to streamline the process is to use Constructive Solid Geometry (CSG) to define shapes as combinations of geometric primitives. This paper outlines the advantages and disadvantages of this method, as well as two major algorithms used to render CSG images. Furthermore, an implementation of CSG shapes using OpenGL is described. Although adequate for the purpose of th ecreated software, there is still room for improvement in CSG usage and implementation.
+\end{abstract}
+\end{titlepage}
+\begin{onehalfspace}
+\tableofcontents
+\listoffigures
+\newpage
+\end{onehalfspace}
 \begin{doublespace}
 \section{Constructive Solid Geometry}
 \subsection{General Concepts}
-Constructive Solid Geometry (CSG) is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include union, intersection, and difference. The types of shapes vary from one implementation to another, but generally include spheres, cubes, and cylinders, as well as their standard transformations (rotations, scaling, translations) \cite{cs_dictionary}. This technique provides a simpler way to create three-dimensional shapes without the need to define each individual vertex or face. CSG objects are organized in binary trees, where leaf nodes are the solid primitives and interior nodes are the boolean operations. The object is then created recursively from the leaves up, with each boolean operation being replaced by the object which it created\cite{gold}.
+Constructive solid geometry is a method for creating more complicated shapes by performing boolean operations on simpler shapes. The available boolean operations include union, intersection, and difference. The types of shapes vary from one implementation to another, but generally include spheres, cubes, and cylinders, as well as their standard transformations (rotations, scaling, translations) \cite{cs_dictionary}. This technique provides a simpler way to create three-dimensional shapes without the need to define each individual vertex or face. CSG objects are organized in binary trees, where leaf nodes are the solid primitives and interior nodes are the boolean operations. The object is then created recursively from the leaves up, with each boolean operation being replaced by the object which it created\cite{gold}.
 
 \begin{figure}[h]
   \includegraphics[width=16cm]{CSG}
@@ -137,7 +147,7 @@ The increased movement of the game objects highlighted one major challenge of co
   \centering
   \caption{The OpenSCAD viewer. As indicated by the legend in the bottom-left corner, the program uses a right-handed coordinate system (the positive z-axis is pointing up). In a left-handed coordinate system, such as the one used by OpenGL, the negative z-axis would be pointing up.}
 \end{figure}
-As the objects moved towards and away from the camera, parts of the objects that should have been hidden were visible, and vice versa. For example, the spaceship engines jut out from the back of the ship. Thus, a viewer positioned in between the two engines should be able to see the right curve of the left engine and the left curve of the right engine, as shown in Figure 4. However, the viewer instead could see the left curve of the left engine and the right curve of the right engine, as seen below right; this perspective made the engines appear recessed instead of external. In order to solve this issue, the z-coordinate of each vertex was multiplied by -1. In conjunction with this fix, the x-value of each obstacle's normal vector was multiplied by -1. This change produced better lighting effects on the obstacles with the new vertex values. The normal vector for the spaceship was left as is.
+As the objects moved towards and away from the camera, parts of the objects that should have been hidden were visible, and vice versa. For example, the spaceship engines jut out from the back of the ship. Thus, a viewer positioned in between the two engines should be able to see the right curve of the left engine and the left curve of the right engine, as shown in Figure 7. However, the viewer instead could see the left curve of the left engine and the right curve of the right engine, as seen below right; this perspective made the engines appear recessed instead of external. In order to solve this issue, the z-coordinate of each vertex was multiplied by -1. In conjunction with this fix, the x-value of each obstacle's normal vector was multiplied by -1. This change produced better lighting effects on the obstacles with the new vertex values. The normal vector for the spaceship was left as is.
 \begin{figure}[h]
   \includegraphics[width=8cm]{GoodPersp}
   \includegraphics[width=8cm]{BadPersp}
@@ -151,30 +161,30 @@ As a whole, the field of constructive solid geometry poses a number of difficult
 \newpage
 \end{doublespace}
 \begin{onehalfspace}
-\section*{Source Code}
-\subsection*{OpenSCAD}
-\subsubsection*{die.scad}
+\section{Source Code}
+\subsection{OpenSCAD}
+\subsubsection{die.scad}
 % \lstinputlisting[language=scad]{die.scad}
-\subsubsection*{connector.scad}
-% \lstinputlisting[language=scad]{connector.scad}
-\subsubsection*{torus.scad}
-% \lstinputlisting[language=scad]{torus.scad}
-\subsubsection*{asteroid.scad}
-% \lstinputlisting[language=scad]{asteroid.scad}
-\subsubsection*{pipes.scad}
-% \lstinputlisting[language=scad]{pipes.scad}
-\subsubsection*{spaceship.scad}
-% \lstinputlisting[language=scad]{spaceship.scad}
-\subsubsection*{cookie\_cutter.scad}
-% \lstinputlisting[language=scad]{cookie_cutter.scad}
+\subsubsection{connector.scad}
+%\lstinputlisting[language=scad]{connector.scad}
+\subsubsection{torus.scad}
+\lstinputlisting[language=scad]{torus.scad}
+\subsubsection{asteroid.scad}
+\lstinputlisting[language=scad]{asteroid.scad}
+\subsubsection{pipes.scad}
+\lstinputlisting[language=scad]{pipes.scad}
+\subsubsection{spaceship.scad}
+\lstinputlisting[language=scad]{spaceship.scad}
+\subsubsection{cookie\_cutter.scad}
+\lstinputlisting[language=scad]{cookie_cutter.scad}
 
-\subsection*{C++}
-\subsubsection*{stlReader.cpp}
-% \lstinputlisting[language=C++]{stlReader.cpp}
-\subsubsection*{display.cpp}
-% \lstinputlisting[language=C++]{display.cpp}
-\subsubsection*{game.cpp}
-% \lstinputlisting[language=C++]{game.cpp}
+\subsection{C++}
+\subsubsection{stlReader.cpp}
+\lstinputlisting[language=C++]{stlReader.cpp}
+\subsubsection{display.cpp}
+\lstinputlisting[language=C++]{display.cpp}
+\subsubsection{game.cpp}
+\lstinputlisting[language=C++]{game.cpp}
 
 \newpage
 \begin{thebibliography}{10}

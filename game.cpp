@@ -48,11 +48,7 @@ void flight(){
   zpos -= speed;
   if(zpos <= -100){
 	zpos = 25;
-	speed += 0.01;
-	if(speed*10 == int(speed*10)){
-	  GameObject tmp;
-	  obstacles.push_back(tmp);
-	}
+	if(speed<1.2) speed += 0.02;
 	for(int i=0; i<obstacles.size(); i++){
 	  for(int j=0; j<3; j++){
 		obstacles[i].position[j]=float(rand())/RAND_MAX;
@@ -107,7 +103,7 @@ void setup_scene(){
   glColor3f(0.5, 0.25, 0.25);
   for(int i=0; i<obstacles.size(); i++){
 	glPushMatrix();
-	glTranslatef(20*obstacles[i].position[0]-10, 20*obstacles[i].position[1]-10, -90*obstacles[i].position[2]-zpos);
+	glTranslatef(30*obstacles[i].position[0]-15, 30*obstacles[i].position[1]-15, -95*obstacles[i].position[2]-zpos);
 	glRotatef(-1.5*zpos, 2*obstacles[i].rotation[0]-1, 2*obstacles[i].rotation[1]-1, 2*obstacles[i].rotation[2]-1);
 	glBegin(GL_TRIANGLES);
 	for(int j=0; j<asteroids.size(); j++){
@@ -119,46 +115,6 @@ void setup_scene(){
 	glEnd();
 	glPopMatrix();
   }
-  // // Draw a series of asteroids
-  // glColor3f(0.5, 0.25, 0.25);
-  // glPushMatrix();
-  // glTranslatef((20*r3)-10, (20*r1)-10, -25-zpos);
-  // glRotatef(-1.5*zpos, r1, r2, r3);
-  // glBegin(GL_TRIANGLES);
-  // for(int i = 0; i<asteroids.size(); i++){
-  // 	glNormal3f(-1*asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
-  // 	for(int j = 2; j>=0; j--){
-  // 	  glVertex3f(asteroids[i].vertices[j][0], asteroids[i].vertices[j][1], -1*asteroids[i].vertices[j][2]);
-  // 	}
-  // }
-  // glEnd();
-  // glPopMatrix();
-
-  // glPushMatrix();
-  // glTranslatef((20*r1)-10, (20*r2)-10, -50-zpos);
-  // glRotatef(-1.5*zpos, -r3, r1, r2);
-  // glBegin(GL_TRIANGLES);
-  // for(int i = 0; i<asteroids.size(); i++){
-  // 	glNormal3f(-1*asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
-  // 	for(int j = 2; j>=0; j--){
-  // 	  glVertex3f(asteroids[i].vertices[j][0], asteroids[i].vertices[j][1], -1*asteroids[i].vertices[j][2]);
-  // 	}
-  // }
-  // glEnd();
-  // glPopMatrix();
-
-  // glPushMatrix();
-  // glTranslatef((20*r2)-10, (20*r1)-10, -75-zpos);
-  // glRotatef(-1.5*zpos, r2, -r3, r1);
-  // glBegin(GL_TRIANGLES);
-  // for(int i = 0; i<asteroids.size(); i++){
-  // 	glNormal3f(-1*asteroids[i].normal[0], asteroids[i].normal[1], asteroids[i].normal[2]);
-  // 	for(int j = 2; j>=0; j--){
-  // 	  glVertex3f(asteroids[i].vertices[j][0], asteroids[i].vertices[j][1], -1*asteroids[i].vertices[j][2]);
-  // 	}
-  // }
-  // glEnd();
-  // glPopMatrix();
 }
 
 void display (void) {
@@ -167,15 +123,15 @@ void display (void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	setup_scene();
+
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
 	glutSwapBuffers();
 }
 
 void init(){
-  GameObject tmp;
-  for(int i=0;i<5;i++){
+  for(int i=0;i<7;i++){
+	GameObject tmp;
 	obstacles.push_back(tmp);
 	for(int j=0; j<3; j++){
 	  obstacles[i].position[j]=float(rand())/RAND_MAX;
