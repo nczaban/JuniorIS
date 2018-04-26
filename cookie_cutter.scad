@@ -1,3 +1,5 @@
+scale([2,2,2]){
+
 union(){
 // Diamond
 	union(){
@@ -123,4 +125,5 @@ union(){
 	translate([-2.5, 0, -1.5]) cube([0.3,.9,1.9], center=true);
 	}
 	}
+}
 }

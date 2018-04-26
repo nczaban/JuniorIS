@@ -54,8 +54,8 @@ void flight(){
   // Change spaceship position
   zpos -= speed;
   if(zpos <= -100){
-	if(speed<1) speed += 0.1;
-	zpos = 50*speed;
+	if(speed<1) speed += 0.02;
+	zpos = 50*speed+25;
 	if(speed*10==int(speed*10)) obstacles.push_back(GameObject());
 	for(int i=0; i<obstacles.size(); i++){
 	  for(int j=0; j<3; j++){
