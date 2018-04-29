@@ -155,20 +155,20 @@ As the objects moved towards and away from the camera, parts of the objects that
   \caption{Two different views of the spaceship model. The left model is the intended view, the right model is how the object was initially rendered in OpenGL.}
 \end{figure}
 
-Another struct, \texttt{GameObject}s, is used to hold two three-element arrays; these three variables determine the rotation and position of each obstacle onscreen. A vector of these \texttt{GameObject}s is created in the \texttt{init} function and populated with 7 asteroids. In a for loop, each obstacle in the vector is drawn with its corresponding rotation and position. For the \texttt{glTranslate} calls, the following equation is used to center the asteroids in the xy-plane of the game screen: \texttt{30*obstacles[i].position[0]-15} for x and \texttt{30*obstacles[i].position[1]-15}for y. The bounds on the spaceship are between -10 and 10 on both the x- and y-axis, and this formula bounds the position of the asteroid between -15 and 15. The z-position of the asteroid is determined by \texttt{-90*obstacles[i].position[2]-zpos}.  \\
+Another struct, \texttt{GameObject}s, is used to hold two three-element arrays; these three variables determine the rotation and position of each obstacle onscreen. A vector of these \texttt{GameObject}s is created in the \texttt{init} function and populated with 7 asteroids. In a for loop, each obstacle in the vector is drawn with its corresponding rotation and position. For the \texttt{glTranslate} calls, the following equation is used to center the asteroids in the xy-plane of the game screen: \texttt{30*obstacles[i].position[0]-15} for x and \texttt{30*obstacles[i].position[1]-15}for y. The bounds on the spaceship are between -10 and 10 on both the x- and y-axis, and this formula bounds the position of the asteroid between -15 and 15. The z-position of the asteroid is determined by \texttt{-90*obstacles[i].position[2]-zpos}.\\
 
 The \texttt{glRotate} calls use the random values with the equation \texttt{2*obstacles[i].rotation[0]-1} for x, \texttt{2*obstacles[i].rotation[1]-1}, for y, and \texttt{2*obstacles[i].rotation[2]-1} for the z-value of the rotation vector. The angle of rotation is calculated by \texttt{-1.5*zpos}, causing the asteroid to continually rotate as it moves through the scene. By multiplying by 2 and subtracting 1, each component of the rotation vector is bounded between -1 and 1.
 \section{Conclusion}
-As a whole, the field of constructive solid geometry poses a number of difficult problems for computer scientists. With real-time rendering infeasible, and the alternative algorithms only suitable in a handful of cases, there is still much research to be done. However, the existing solutions are more than adequate to produce usable and complete software, as evidenced by the display program and the asteroid game.
+As a whole, the field of constructive solid geometry poses a number of difficult problems for computer scientists. With real-time rendering infeasible, and the alternative algorithms only suitable in a handful of cases, there is still much research to be done. However, the existing solutions are more than adequate to produce usable and complete software, as evidenced by the display program and the asteroid game. Although the OpenGL implementation was not ideal for rendering the 
 \newpage
 \end{doublespace}
 \begin{onehalfspace}
 \section{Source Code}
 \subsection{OpenSCAD}
 \subsubsection{die.scad}
-% \lstinputlisting[language=scad]{die.scad}
+\lstinputlisting[language=scad]{die.scad}
 \subsubsection{connector.scad}
-%\lstinputlisting[language=scad]{connector.scad}
+\lstinputlisting[language=scad]{connector.scad}
 \subsubsection{torus.scad}
 \lstinputlisting[language=scad]{torus.scad}
 \subsubsection{asteroid.scad}
